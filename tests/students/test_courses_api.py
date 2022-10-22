@@ -31,8 +31,8 @@ def student_factory():
 @pytest.mark.django_db  # тест успешного создания через фабрику
 def test_create_course(client, course_factory):
     course = course_factory()
-    resp = client.post(f'{URL}/courses/', data={'name': course.name})
-    assert resp.status_code == 201
+    resp = client.get(f'{URL}/courses/{course.id}/')
+    assert resp.status_code == 200
     assert resp.data['name'] == course.name
 
 
@@ -70,11 +70,13 @@ def test_get_filter_id_courses(client, course_factory):
 
 
 @pytest.mark.django_db   # тест успешного создания курса через API
-def test_create_course_api(client, course_factory):
+def test_create_course_api(client):
     course = {'name': 'Python'}
     resp = client.post(f'{URL}/courses/', course)
     assert resp.status_code == 201
-    assert resp.data['name'] == course['name']
+    resp2 = client.get(f'{URL}/courses/{resp.data["id"]}/')
+    assert resp2.status_code == 200
+    assert resp2.data['name'] == course['name']
 
 
 @pytest.mark.django_db  # тест успешного обновления
